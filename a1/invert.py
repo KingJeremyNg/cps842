@@ -21,12 +21,13 @@ class DocumentCollection:
             "authors": authors
         }
 
+    # Open and read common_words files
     def readStopWordsFile(self, file):
-        # Open and read common_words files
         with open(file, "r") as words:
             for word in words:
                 # [0:-1] to remove newline character
                 self.stopWords.add(word[0:-1])
+        words.close()
 
     # Function to parse input. **Hard to differentiate "-" between minus or hyphen**
     def parse(self, text):
@@ -44,9 +45,9 @@ class DocumentCollection:
         if "<" in text:
             text = text.replace("<", " less than ")
         if ">" in text:
-            text = text.replace("<", " greater than ")
+            text = text.replace(">", " greater than ")
         if "+" in text:
-            text = text.replace("<", " add ")
+            text = text.replace("+", " add ")
         if "^" in text:
             text = text.replace("^", " raised to the power of ")
         if "&" in text:
@@ -67,6 +68,7 @@ class DocumentCollection:
             date = ""
             authors = []
             mode = ".I"
+            modeSet = [".T", ".W", ".B", ".A", ".N", ".K", ".C", ".X"]
             for line in document:
                 if line.startswith(".I"):
                     # Store previous index information
@@ -78,18 +80,10 @@ class DocumentCollection:
                     date = ""
                     authors = []
                 # Set mode
-                elif line.startswith(".T"):
-                    mode = ".T"
-                elif line.startswith(".W"):
-                    mode = ".W"
-                elif line.startswith(".B"):
-                    mode = ".B"
-                elif line.startswith(".A"):
-                    mode = ".A"
-                elif line.startswith(".X"):
-                    mode = ".X"
-                elif line.startswith(".N"):
-                    mode = ".N"
+                for string in modeSet:
+                    if line.startswith(string):
+                        mode = string
+                        break
                 # If line is not setting mode then store data. [0:-1] to remove newline character
                 else:
                     if mode == ".T":
@@ -112,7 +106,9 @@ class DocumentCollection:
                         authors.append(line[0:-1])
             # Edge case for last index
             self.addDocument(index, title, abstract, date, authors)
+        document.close()
 
+    # Apply porter's stemming algorithm to every word of our documents
     def porterStemmingAlgorithm(self):
         porter = PorterStemmer()
         for key in self.index:
@@ -136,8 +132,8 @@ class DocumentCollection:
                 }
             }
         else:
-            self.dictionary[word]["df"] += 1
             if index not in self.dictionary[word]["docID"]:
+                self.dictionary[word]["df"] += 1
                 self.dictionary[word]["docID"][index] = {
                     "tf": 1,
                     "position": [position]
@@ -157,6 +153,7 @@ class DocumentCollection:
                 self.addToDictionary(key, word, position)
                 position += 1
 
+    # Make dictionary and postings lists files
     def createFiles(self):
         dictionaryFile = open("./output/dictionary.txt", "w")
         postingsLists = open("./output/postingsLists.txt", "w")
