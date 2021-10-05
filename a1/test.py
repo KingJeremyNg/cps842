@@ -66,7 +66,7 @@ def getTitle(document):
 # Simple parser
 def parse(text):
     chars = ["'s", "'", "-", ".",
-             "(", ")", "{", "}", "[", "]", ":", ";", ",", '"', "*", "/", "?", "!", "$"]
+             "(", ")", "{", "}", "[", "]", ":", ";", ",", '"', "*", "/", "?", "!", "$", "`"]
     for char in chars:
         if char in text:
             text = text.replace(char, " ")
@@ -96,9 +96,9 @@ def getAbstract(document, stem, porter):
         if search in document:
             end = document.index(search)
             break
-    document = parse(document[start:end].lower().replace("\n", " "))
+    document = parse(document[start:end].replace("\n", " "))
     for i in range(len(document)):
-        if stem == porter.stem(document[i]):
+        if stem == porter.stem(document[i].lower()):
             middle = i
             break
     else:
@@ -130,3 +130,4 @@ if __name__ == "__main__":
         else:
             print(f'\nThe word "{search}" does not exist!')
         search = input("\nEnter Search: ").lower()
+    print("Program stopping...")

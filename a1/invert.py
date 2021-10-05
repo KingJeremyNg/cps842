@@ -32,7 +32,7 @@ class DocumentCollection:
     # Function to parse input. **Hard to differentiate "-" between minus or hyphen**
     def parse(self, text):
         chars = ["'s", "'", "-", ".",
-                 "(", ")", "{", "}", "[", "]", ":", ";", ",", '"', "*", "/", "?", "!", "$"]
+                 "(", ")", "{", "}", "[", "]", ":", ";", ",", '"', "*", "/", "?", "!", "$", "`"]
         for char in chars:
             if char in text:
                 text = text.replace(char, " ")
