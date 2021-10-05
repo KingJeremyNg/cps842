@@ -36,26 +36,21 @@ class DocumentCollection:
         for char in chars:
             if char in text:
                 text = text.replace(char, " ")
-        if "<=" in text:
-            text = text.replace("<=", " less than or equal to ")
-        if ">=" in text:
-            text = text.replace("<=", " greater than or equal to ")
-        if "=" in text:
-            text = text.replace("=", " equal to ")
-        if "<" in text:
-            text = text.replace("<", " less than ")
-        if ">" in text:
-            text = text.replace(">", " greater than ")
-        if "+" in text:
-            text = text.replace("+", " add ")
-        if "^" in text:
-            text = text.replace("^", " raised to the power of ")
-        if "&" in text:
-            text = text.replace("&", " and ")
-        if "%" in text:
-            text = text.replace("%", " percent ")
-        if "+" in text:
-            text = text.replace("+", " plus ")
+        operators = {
+            "<=": " less than or equal to ",
+            ">=": " greater than or equal to ",
+            "=": " equal to ",
+            "<": " less than ",
+            ">": " greater than ",
+            "+": " add ",
+            "^": " raised to the power of ",
+            "&": " and ",
+            "%": " percent ",
+            "+": " plus "
+        }
+        for key, val in operators.items():
+            if key in text:
+                text = text.replace(key, val)
         return text.split()
 
     # Function to read and parse files
@@ -74,7 +69,7 @@ class DocumentCollection:
                     # Store previous index information
                     self.addDocument(index, title, abstract, date, authors)
                     # Clear variables and set new index
-                    index = line.split(" ")[-1][0:-1]
+                    index = line[3:-1]
                     title = []
                     abstract = []
                     date = ""
@@ -106,6 +101,8 @@ class DocumentCollection:
                         authors.append(line[0:-1])
             # Edge case for last index
             self.addDocument(index, title, abstract, date, authors)
+            # Delete this record
+            del self.index[0]
         document.close()
 
     # Apply porter's stemming algorithm to every word of our documents
@@ -114,10 +111,10 @@ class DocumentCollection:
         for key in self.index:
             for i in range(len(self.index[key]["title"])):
                 self.index[key]["title"][i] = porter.stem(
-                    self.index[key]["title"][i], 0, len(self.index[key]["title"][i]) - 1)
+                    self.index[key]["title"][i])
             for i in range(len(self.index[key]["abstract"])):
                 self.index[key]["abstract"][i] = porter.stem(
-                    self.index[key]["abstract"][i], 0, len(self.index[key]["abstract"][i]) - 1)
+                    self.index[key]["abstract"][i])
 
     # Add to dictionary
     def addToDictionary(self, index, word, position):

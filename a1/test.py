@@ -69,8 +69,23 @@ def parse(text):
              "(", ")", "{", "}", "[", "]", ":", ";", ",", '"', "*", "/", "?", "!", "$"]
     for char in chars:
         if char in text:
-            text = text.replace(char, "")
-    return text
+            text = text.replace(char, " ")
+    operators = {
+        "<=": " less than or equal to ",
+        ">=": " greater than or equal to ",
+        "=": " equal to ",
+        "<": " less than ",
+        ">": " greater than ",
+        "+": " add ",
+        "^": " raised to the power of ",
+        "&": " and ",
+        "%": " percent ",
+        "+": " plus "
+    }
+    for key, val in operators.items():
+        if key in text:
+            text = text.replace(key, val)
+    return text.split()
 
 
 def getAbstract(document, stem, porter):
@@ -81,15 +96,14 @@ def getAbstract(document, stem, porter):
         if search in document:
             end = document.index(search)
             break
-    document = document[start:end].replace("\n", " ").split()
+    document = parse(document[start:end].lower().replace("\n", " "))
     for i in range(len(document)):
-        term = parse(document[i].lower())
-        if stem == porter.stem(term, 0, len(term) - 1):
+        if stem == porter.stem(document[i]):
             middle = i
             break
     else:
         return "No Context"
-    return " ".join(document[middle - 10: middle + 11])
+    return " ".join(document[max(0, middle - 10): middle + 11])
 
 
 if __name__ == "__main__":
@@ -99,7 +113,7 @@ if __name__ == "__main__":
     porter = PorterStemmer()
     search = input("Enter Search: ").lower()
     while(search != "zzend"):
-        stem = porter.stem(search, 0, len(search) - 1)
+        stem = porter.stem(search)
         if stem in data.dictionary:
             print(
                 f'\nThe word "{search}" has been found in {data.dictionary[stem]["df"]} document(s)!\n')

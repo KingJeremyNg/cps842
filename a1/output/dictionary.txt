@@ -670,7 +670,7 @@ ad 39
 ada 1
 adam 2
 adapt 38
-add 40
+add 9
 addend 2
 addendum 4
 adder 3
