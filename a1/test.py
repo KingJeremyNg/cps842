@@ -2,6 +2,7 @@
 # CPS842 Assignment 1
 
 from porter import PorterStemmer
+import time
 
 
 class Dictionary:
@@ -111,8 +112,11 @@ if __name__ == "__main__":
     data.readFiles("./output/dictionary.txt",
                    "./output/postingsLists.txt")
     porter = PorterStemmer()
+    times = []
     search = input("Enter Search: ").lower()
+    start = time.time()
     while(search != "zzend"):
+        start = time.time()
         stem = porter.stem(search)
         if stem in data.dictionary:
             print(
@@ -127,7 +131,13 @@ if __name__ == "__main__":
                 print("Title: " + getTitle(document))
                 print("Context: " + getAbstract(document, stem, porter))
                 print()
+            end = time.time()
+            times += [end - start]
+            print(f'Search took {round(times[-1], 2)} seconds.')
         else:
             print(f'\nThe word "{search}" does not exist!')
         search = input("\nEnter Search: ").lower()
+        start = time.time()
+    if times:
+        print(f'Average Time: {round(sum(times) / len(times), 2)} seconds.')
     print("Program stopping...")
