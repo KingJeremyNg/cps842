@@ -154,6 +154,10 @@ class DocumentCollection:
     def createFiles(self):
         dictionaryFile = open("./output/dictionary.txt", "w")
         postingsLists = open("./output/postingsLists.txt", "w")
+        if "-p" in sys.argv or "-porter" in sys.argv:
+            dictionaryFile.write(".porter yes\n")
+        else:
+            dictionaryFile.write(".porter no\n")
         for key in sorted(self.dictionary):
             dictionaryFile.write(f'{key} {self.dictionary[key]["df"]}\n')
             postingsLists.write(f'.{key}\n')
