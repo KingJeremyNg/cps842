@@ -40,7 +40,7 @@ class Dictionary:
 
 
     # Get information relating to index ID from collection file
-    def getDocument(self, index, filePath="./data/cacm.all"):
+    def getDocument(self, index, filePath="../data/cacm.all"):
         with open(filePath, "r") as collection:
             file = collection.read()
             collection.close()
@@ -117,8 +117,8 @@ class Dictionary:
 
 if __name__ == "__main__":
     data = Dictionary()
-    data.readFiles("./output/dictionary.txt",
-                   "./output/postingsLists.txt")
+    data.readFiles("../output/dictionary.txt",
+                   "../output/postingsLists.txt")
     porter = PorterStemmer()
     times = []
     search = input("Enter Search: ").lower()

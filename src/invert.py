@@ -152,8 +152,8 @@ class DocumentCollection:
 
     # Make dictionary and postings lists files
     def createFiles(self):
-        dictionaryFile = open("./output/dictionary.txt", "w")
-        postingsLists = open("./output/postingsLists.txt", "w")
+        dictionaryFile = open("../output/dictionary.txt", "w")
+        postingsLists = open("../output/postingsLists.txt", "w")
         if "-p" in sys.argv or "-porter" in sys.argv:
             dictionaryFile.write(".porter yes\n")
         else:
@@ -172,9 +172,9 @@ if __name__ == "__main__":
     docCol = DocumentCollection()
 
     if "-s" in sys.argv or "-stop" in sys.argv:
-        docCol.readStopWordsFile("./data/common_words")
+        docCol.readStopWordsFile("../data/common_words")
 
-    docCol.readDocuments("./data/cacm.all")
+    docCol.readDocuments("../data/cacm.all")
 
     if "-p" in sys.argv or "-porter" in sys.argv:
         docCol.porterStemmingAlgorithm()
