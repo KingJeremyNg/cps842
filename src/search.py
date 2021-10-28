@@ -18,11 +18,13 @@ class TopK(DocumentCollection):
         self.queryVector = {}
         self.similarity = {}
 
+    # Calculate IDF for each word in the dictionary
     def calculateIDF(self):
         for word in self.dictionary:
             self.dictionary[word]["idf"] = math.log(
                 self.N / self.dictionary[word]["df"], 10)
 
+    # Calculate weight for documents that contain at least 1 word from query
     def calculateWeight(self):
         self.weights = {}
         self.queryVector = {}
@@ -39,6 +41,7 @@ class TopK(DocumentCollection):
                         1 + math.log(self.query.count(word), 10)) * self.dictionary[word]["idf"]
             seen.add(word)
 
+    # Calculate magnitude of weights in a given index
     def getMag(self, index):
         seen = set()
         weights = []
@@ -46,11 +49,12 @@ class TopK(DocumentCollection):
             if word in seen:
                 continue
             weights += [((1 + math.log(self.dictionary[word]["docID"]
-                                      [index]["tf"], 10)) * self.dictionary[word]["idf"]) ** 2]
+                                       [index]["tf"], 10)) * self.dictionary[word]["idf"]) ** 2]
             seen.add(word)
         return sum(weights) ** 0.5
 
-    def calculateCosineSimularity(self):
+    # Calculate cosine similarity of documents containing at least 1 word from query
+    def calculateCosineSimilarity(self):
         self.similarity = {}
         for word in self.weights:
             for docID in self.weights[word]:
@@ -61,20 +65,19 @@ class TopK(DocumentCollection):
         for docID in self.similarity:
             seen = set()
             arr = []
-            queryMag = []
             for word in self.query:
                 if word in seen:
                     continue
                 if word in self.similarity[docID] and word in self.queryVector:
                     arr += [self.similarity[docID]
                             [word] * self.queryVector[word]]
-                if word in self.queryVector:
-                    queryMag += [self.queryVector[word]]
                 seen.add(word)
             docMag = self.getMag(docID)
-            queryMag = (sum([x ** 2 for x in queryMag])) ** 0.5
+            queryMag = (
+                sum([x ** 2 for x in [val for key, val in self.queryVector.items()]])) ** 0.5
             self.similarity[docID] = sum(arr) / (docMag * queryMag)
 
+    # Get top K documents
     def printRank(self, k):
         if not self.similarity:
             print("No documents")
@@ -111,7 +114,7 @@ def main():
         else:
             docCol.query = query
         docCol.calculateWeight()
-        docCol.calculateCosineSimularity()
+        docCol.calculateCosineSimilarity()
         docCol.printRank(10)
         query = parse(input("\nEnter Query: ").lower())
 

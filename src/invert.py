@@ -120,10 +120,7 @@ class DocumentCollection:
     def createDictionary(self):
         for key in self.index:
             position = 1
-            for word in self.index[key]["title"]:
-                self.addToDictionary(key, word, position)
-                position += 1
-            for word in self.index[key]["abstract"]:
+            for word in self.index[key]["title"] + self.index[key]["abstract"]:
                 self.addToDictionary(key, word, position)
                 position += 1
 
