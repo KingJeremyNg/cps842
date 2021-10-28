@@ -1,8 +1,9 @@
 # Jeremy Ng 500882192
-# CPS842 Assignment 1
+# CPS842 Project
 
-from porter import PorterStemmer
 import time
+from porter import PorterStemmer
+from parse import parse
 
 
 class Dictionary:
@@ -38,7 +39,6 @@ class Dictionary:
                     }
         postingsLists.close()
 
-
     # Get information relating to index ID from collection file
     def getDocument(self, index, filePath="../data/cacm.all"):
         with open(filePath, "r") as collection:
@@ -54,7 +54,6 @@ class Dictionary:
         else:
             return "No Document"
 
-
     # Get title information from document
     def getTitle(self, document):
         if ".T" not in document:
@@ -66,32 +65,7 @@ class Dictionary:
                 break
         return document[start:end].replace("\n", " ")
 
-
-    # Simple parser
-    def parse(self, text):
-        chars = ["'s", "'", "-", ".",
-                "(", ")", "{", "}", "[", "]", ":", ";", ",", '"', "*", "/", "?", "!", "$", "`"]
-        for char in chars:
-            if char in text:
-                text = text.replace(char, " ")
-        operators = {
-            "<=": " less than or equal to ",
-            ">=": " greater than or equal to ",
-            "=": " equal to ",
-            "<": " less than ",
-            ">": " greater than ",
-            "+": " add ",
-            "^": " raised to the power of ",
-            "&": " and ",
-            "%": " percent ",
-            "+": " plus "
-        }
-        for key, val in operators.items():
-            if key in text:
-                text = text.replace(key, val)
-        return text.split()
-
-
+    # Get abstract information from document
     def getAbstract(self, document, stem, porter):
         if ".W" not in document:
             return "No Abstract"
@@ -100,7 +74,7 @@ class Dictionary:
             if search in document:
                 end = document.index(search)
                 break
-        document = self.parse(document[start:end].replace("\n", " "))
+        document = parse(document[start:end].replace("\n", " "))
         for i in range(len(document)):
             if self.porter:
                 if stem == porter.stem(document[i].lower()):
@@ -126,21 +100,21 @@ if __name__ == "__main__":
     while(search != "zzend"):
         start = time.time()
         if data.porter:
-            stem = porter.stem(search)
+            word = porter.stem(search)
         else:
-            stem = search
-        if stem in data.dictionary:
+            word = search
+        if word in data.dictionary:
             print(
-                f'\nThe word "{search}" has been found in {data.dictionary[stem]["df"]} document(s)!\n')
-            for index in data.dictionary[stem]["docID"]:
-                tf = data.dictionary[stem]["docID"][index]["tf"]
-                position = data.dictionary[stem]["docID"][index]["position"]
+                f'\nThe word "{search}" has been found in {data.dictionary[word]["df"]} document(s)!\n')
+            for index in data.dictionary[word]["docID"]:
+                tf = data.dictionary[word]["docID"][index]["tf"]
+                position = data.dictionary[word]["docID"][index]["position"]
                 document = data.getDocument(index)
                 print("Index: " + index)
                 print("Term Frequency: " + str(tf))
                 print("Position: " + ", ".join(position))
                 print("Title: " + data.getTitle(document))
-                print("Context: " + data.getAbstract(document, stem, porter))
+                print("Context: " + data.getAbstract(document, word, porter))
                 print()
             end = time.time()
             times += [end - start]

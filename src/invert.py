@@ -1,8 +1,9 @@
 # Jeremy Ng 500882192
-# CPS842 Assignment 1
+# CPS842 Project
 
 import sys
 from porter import PorterStemmer
+from parse import parse
 
 
 class DocumentCollection:
@@ -28,30 +29,6 @@ class DocumentCollection:
                 # [0:-1] to remove newline character
                 self.stopWords.add(word[0:-1])
         words.close()
-
-    # Function to parse input. **Hard to differentiate "-" between minus or hyphen**
-    def parse(self, text):
-        chars = ["'s", "'", "-", ".",
-                 "(", ")", "{", "}", "[", "]", ":", ";", ",", '"', "*", "/", "?", "!", "$", "`"]
-        for char in chars:
-            if char in text:
-                text = text.replace(char, " ")
-        operators = {
-            "<=": " less than or equal to ",
-            ">=": " greater than or equal to ",
-            "=": " equal to ",
-            "<": " less than ",
-            ">": " greater than ",
-            "+": " add ",
-            "^": " raised to the power of ",
-            "&": " and ",
-            "%": " percent ",
-            "+": " plus "
-        }
-        for key, val in operators.items():
-            if key in text:
-                text = text.replace(key, val)
-        return text.split()
 
     # Function to read and parse files
     def readDocuments(self, collection):
@@ -82,14 +59,14 @@ class DocumentCollection:
                 # If line is not setting mode then store data. [0:-1] to remove newline character
                 else:
                     if mode == ".T":
-                        for word in self.parse(line[0:-1].lower()):
+                        for word in parse(line[0:-1].lower()):
                             if "-s" in sys.argv or "-stop" in sys.argv:
                                 if word not in self.stopWords:
                                     title += [word]
                             else:
                                 title += [word]
                     if mode == ".W":
-                        for word in self.parse(line[0:-1].lower()):
+                        for word in parse(line[0:-1].lower()):
                             if "-s" in sys.argv or "-stop" in sys.argv:
                                 if word not in self.stopWords:
                                     abstract += [word]
@@ -168,7 +145,7 @@ class DocumentCollection:
         postingsLists.close()
 
 
-if __name__ == "__main__":
+def main():
     docCol = DocumentCollection()
 
     if "-s" in sys.argv or "-stop" in sys.argv:
@@ -182,3 +159,7 @@ if __name__ == "__main__":
     docCol.createDictionary()
 
     docCol.createFiles()
+
+
+if __name__ == "__main__":
+    main()
