@@ -56,6 +56,8 @@ class TopK(DocumentCollection):
     # Calculate cosine similarity of documents containing at least 1 word from query
     def calculateCosineSimilarity(self):
         self.similarity = {}
+        queryMag = (
+            sum([x ** 2 for x in [val for key, val in self.queryVector.items()]])) ** 0.5
         for word in self.weights:
             for docID in self.weights[word]:
                 if docID not in self.similarity:
@@ -73,21 +75,23 @@ class TopK(DocumentCollection):
                             [word] * self.queryVector[word]]
                 seen.add(word)
             docMag = self.getMag(docID)
-            queryMag = (
-                sum([x ** 2 for x in [val for key, val in self.queryVector.items()]])) ** 0.5
             self.similarity[docID] = sum(arr) / (docMag * queryMag)
 
     # Get top K documents
-    def printRank(self, k):
+    def getRank(self, k, verbose=False):
         if not self.similarity:
             print("No documents")
             return
-        count = 0
-        for key in sorted(self.similarity, key=self.similarity.get, reverse=True):
-            if count == k:
+        result = []
+        count = 1
+        for docID in sorted(self.similarity, key=self.similarity.get, reverse=True):
+            if count > k:
                 break
-            print(key, round(self.similarity[key], 2))
+            if verbose:
+                print(f'{count}. {docID}, {round(self.similarity[docID], 2)}')
+            result += [docID]
             count += 1
+        return result
 
 
 def main():
@@ -115,7 +119,7 @@ def main():
             docCol.query = query
         docCol.calculateWeight()
         docCol.calculateCosineSimilarity()
-        docCol.printRank(10)
+        docCol.getRank(10, True)
         query = parse(input("\nEnter Query: ").lower())
 
 
