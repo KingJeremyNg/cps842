@@ -6,7 +6,6 @@ import math
 from parse import parse
 from invert import DocumentCollection
 from porter import PorterStemmer
-from test import Dictionary
 
 
 class TopK(DocumentCollection):
@@ -37,8 +36,8 @@ class TopK(DocumentCollection):
                 for docID in self.dictionary[word]["docID"]:
                     self.weights[word][docID] = (
                         1 + math.log(self.dictionary[word]["docID"][docID]["tf"], 10)) * self.dictionary[word]["idf"]
-                    self.queryVector[word] = (
-                        1 + math.log(self.query.count(word), 10)) * self.dictionary[word]["idf"]
+                self.queryVector[word] = (
+                    1 + math.log(self.query.count(word), 10)) * self.dictionary[word]["idf"]
             seen.add(word)
 
     # Calculate magnitude of weights in a given index
@@ -56,8 +55,6 @@ class TopK(DocumentCollection):
     # Calculate cosine similarity of documents containing at least 1 word from query
     def calculateCosineSimilarity(self):
         self.similarity = {}
-        queryMag = (
-            sum([x ** 2 for x in [val for key, val in self.queryVector.items()]])) ** 0.5
         for word in self.weights:
             for docID in self.weights[word]:
                 if docID not in self.similarity:
@@ -75,7 +72,35 @@ class TopK(DocumentCollection):
                             [word] * self.queryVector[word]]
                 seen.add(word)
             docMag = self.getMag(docID)
+            queryMag = (
+                sum([x ** 2 for x in [val for key, val in self.queryVector.items()]])) ** 0.5
             self.similarity[docID] = sum(arr) / (docMag * queryMag)
+
+    # Get information relating to index ID from collection file
+    def getDocument(self, index, filePath="../data/cacm.all"):
+        with open(filePath, "r") as collection:
+            file = collection.read()
+        collection.close()
+        if f'.I {index}' in file:
+            start = file.index(f'.I {index}')
+            if f'.I {int(index) + 1}' in file:
+                end = file.index(f'.I {int(index) + 1}')
+                return file[start:end]
+            else:
+                return file[start:-1]
+        else:
+            return "No Document"
+
+    # Get title information from document
+    def getTitle(self, document):
+        if ".T" not in document:
+            return "No Title"
+        start = document.index(".T") + 3
+        for search in [".W", ".B", ".A", ".N", ".X"]:
+            if search in document:
+                end = document.index(search)
+                break
+        return document[start:end].replace("\n", " ")
 
     # Get top K documents
     def getRank(self, k, verbose=False):
@@ -88,7 +113,10 @@ class TopK(DocumentCollection):
             if count > k:
                 break
             if verbose:
-                print(f'{count}. {docID}, {round(self.similarity[docID], 2)}')
+                print(f'\n{count})')
+                print(f'Index: {docID}')
+                print(f'Title: {self.getTitle(self.getDocument(docID))}')
+                print(f'Author(s): {" | ".join(self.index[docID]["authors"])}')
             result += [docID]
             count += 1
         return result

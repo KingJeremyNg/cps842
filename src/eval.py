@@ -15,6 +15,7 @@ class Eval(TopK):
         self.maps = []
         self.rpValues = []
 
+    # Read from query.text and qrels.text
     def loadQueries(self, porter, queryPath, qrelsPath):
         with open(queryPath, "r") as queryFile:
             mode = ""
@@ -44,6 +45,8 @@ class Eval(TopK):
             for key, val in self.queries.items():
                 self.queries[key] = parse(val.lower())
 
+    # Get Top K ranking documents from search and calculate MAP and R-Precision for all queries
+    # Then calculate and print the average MAP and R-Precision values
     def compare(self):
         for queryID in self.queries:
             if queryID not in self.qrels:
@@ -57,7 +60,7 @@ class Eval(TopK):
             precisions = []
             count = 1
             magREL = len(self.qrels[queryID])
-            for docID in self.getRank(999, verbose=False):
+            for docID in self.getRank(10, verbose=False):
                 if docID in self.qrels[queryID]:
                     recalls += [(len(recalls) + 1) / magREL]
                     precisions += [(len(precisions) + 1) / count]
