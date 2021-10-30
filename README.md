@@ -49,20 +49,20 @@ By using a list of queries from `query.text` and passing it through `eval.py`, w
 ```
 $ python eval.py -s -p
 Average MAP: 0.1
-Average R-Precision: 0.31
+Average R-Precision: 0.307
 ```
 ```
 $ python eval.py -p
-Average MAP: 0.1
-Average R-Precision: 0.31
+Average MAP: 0.099
+Average R-Precision: 0.314
 ```
 ```
 $ python eval.py -s
-Average MAP: 0.1
-Average R-Precision: 0.31
+Average MAP: 0.102
+Average R-Precision: 0.307
 ```
 ```
 $ python eval.py
-Average MAP: 0.1
-Average R-Precision: 0.28
+Average MAP: 0.096
+Average R-Precision: 0.284
 ```

@@ -70,9 +70,9 @@ class Eval(TopK):
                 self.rpValues += [0]
             else:
                 self.rpValues += [precisions[-1]]
-        print(f'Average MAP: {round(sum(self.maps) / len(self.maps), 2)}')
+        print(f'Average MAP: {round(sum(self.maps) / len(self.maps), 3)}')
         print(
-            f'Average R-Precision: {round(sum(self.rpValues) / len(self.rpValues), 2)}')
+            f'Average R-Precision: {round(sum(self.rpValues) / len(self.rpValues), 3)}')
 
 
 def main():
