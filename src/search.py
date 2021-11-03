@@ -55,6 +55,8 @@ class TopK(DocumentCollection):
     # Calculate cosine similarity of documents containing at least 1 word from query
     def calculateCosineSimilarity(self):
         self.similarity = {}
+        queryMag = (
+                sum([x ** 2 for x in [val for key, val in self.queryVector.items()]])) ** 0.5
         for word in self.weights:
             for docID in self.weights[word]:
                 if docID not in self.similarity:
@@ -72,8 +74,6 @@ class TopK(DocumentCollection):
                             [word] * self.queryVector[word]]
                 seen.add(word)
             docMag = self.getMag(docID)
-            queryMag = (
-                sum([x ** 2 for x in [val for key, val in self.queryVector.items()]])) ** 0.5
             self.similarity[docID] = sum(arr) / (docMag * queryMag)
 
     # Get information relating to index ID from collection file
@@ -117,6 +117,7 @@ class TopK(DocumentCollection):
                 print(f'Index: {docID}')
                 print(f'Title: {self.getTitle(self.getDocument(docID))}')
                 print(f'Author(s): {" | ".join(self.index[docID]["authors"])}')
+                # print(f'COSINE SIMILARITY: {self.similarity[docID]}')
             result += [docID]
             count += 1
         return result

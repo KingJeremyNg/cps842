@@ -50,8 +50,6 @@ class Eval(TopK):
     def compare(self):
         for queryID in self.queries:
             if queryID not in self.qrels:
-                self.maps += [0]
-                self.rpValues += [0]
                 continue
             self.query = self.queries[queryID]
             self.calculateWeight()
@@ -59,17 +57,21 @@ class Eval(TopK):
             recalls = []
             precisions = []
             count = 1
+            rPrecision = 0
             magREL = len(self.qrels[queryID])
             for docID in self.getRank(10, verbose=False):
                 if docID in self.qrels[queryID]:
+                    if count <= len(self.qrels[queryID]):
+                        rPrecision += 1
                     recalls += [(len(recalls) + 1) / magREL]
                     precisions += [(len(precisions) + 1) / count]
                 count += 1
             self.maps += [sum(precisions) / magREL]
-            if not precisions:
-                self.rpValues += [0]
-            else:
-                self.rpValues += [precisions[-1]]
+            self.rpValues += [rPrecision / len(self.qrels[queryID])]
+            # print(f'Query ID: {queryID}')
+            # print(f'REL: {self.qrels[queryID]}')
+            # print(f'RET: {self.getRank(10, verbose=False)}')
+            # print(f'R-PRECISION: {rPrecision} / {len(self.qrels[queryID])}')
         print(f'Average MAP: {round(sum(self.maps) / len(self.maps), 3)}')
         print(
             f'Average R-Precision: {round(sum(self.rpValues) / len(self.rpValues), 3)}')

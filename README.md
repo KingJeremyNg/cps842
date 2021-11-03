@@ -44,25 +44,25 @@ To calculate cosine similarity scores:
 * Finally, take of dot product of document and query divided by the magnitude of document times the magnitude of query.
 
 # Results
-By using a list of queries from `query.text` and passing it through `eval.py`, we can assess the average `MAP` and `R-Precision` values
+By using a list of queries from `query.text` and passing it through `eval.py`, we can assess the average `MAP` and `R-Precision` values by comparing our returned list of documents from `search.py` and the documents in `qrels.text`
 
 ```
 $ python eval.py -s -p
-Average MAP: 0.1
-Average R-Precision: 0.307
+Average MAP: 0.124
+Average R-Precision: 0.162
 ```
 ```
 $ python eval.py -p
-Average MAP: 0.099
-Average R-Precision: 0.314
+Average MAP: 0.121
+Average R-Precision: 0.166
 ```
 ```
 $ python eval.py -s
-Average MAP: 0.102
-Average R-Precision: 0.307
+Average MAP: 0.126
+Average R-Precision: 0.182
 ```
 ```
 $ python eval.py
-Average MAP: 0.096
-Average R-Precision: 0.284
+Average MAP: 0.118
+Average R-Precision: 0.159
 ```
